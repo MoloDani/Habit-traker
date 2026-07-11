@@ -10,7 +10,7 @@ app.get('/health', (req, res) => {
 
 app.get('/health/db', async (req, res) =>{
     try{
-        await db.pool.query('SELECT 1');
+        await db.query('SELECT 1');
         res.json({ db: 'connected' });
     } catch (error) {
         res.status(500).json({ db: 'error', message: error.message});
