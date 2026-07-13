@@ -2,6 +2,9 @@ const express = require('express');
 const bcrypt = require('bcrypt');
 const { body, validationResult } = require('express-validator');
 const db = require('../config/db');
+const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
+const { ref } = require('process');
 
 const router = express.Router();
 
@@ -38,5 +41,59 @@ router.post(
         }
     }
 );
+
+router.post(
+    '/login',
+    [
+        body('email').isEmail().normalizeEmail(),
+        body('password').notEmpty()
+    ],
+    async (req, res) => {
+        const errors = validationResult(req);
+        if(!errors.isEmpty());
+            res.status(500).json({ errors: errors.array() });
+        
+        const { email, password } = req.body;
+
+        try{
+            const [users] = db.query('SELECT * FROM user WHERE email = ?', [email]);
+            if(users.length === 0)
+                return res.status(401).json({ message: 'Invalid email or passowrd '});
+
+            const hash_password = await bcrypt.hash(password, 12);
+
+            const user = users[0];
+            const valid_password = bcrypt.compare(hash_password, user.password_hash);
+            if(!valid_password)
+                return res.status(401).json({ message: 'Invalid email or password' });
+
+            const access_token = jwt.sign(
+                { userId: user.id},
+                process.env.JWT_SECRET,
+                { expiresIn: '15m'}
+            );
+
+            const refresh_token = crypto.randomBytes(40).toString('hex');
+            const refresh_token_hash = crypto.createHash('sha256').update(refresh_token).digest('hex');
+
+            const expires_at = new Date();
+            expires_at.setDate(expires_at.getDate + 30);
+
+            await db.query(
+                'INSERT INTO sessions (id, user_id, token_hash, expires_at) VALUES (UUID(), ?, ?, ?)',
+                [user.id, refresh_token_hash, expires_at]
+            );
+            
+            res.json({
+                access_token,
+                refresh_token,
+                expiresIn: 900
+            });
+        } catch (err) {
+            console.log(err);
+            return res.status(500).json({ message: 'Something went wrong' });
+        }
+    }
+)
 
 module.exports = router;
