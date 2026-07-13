@@ -17,4 +17,6 @@ app.get('/health/db', async (req, res) =>{
     }
 })
 
+app.post('/auth', authRoutes);
+
 module.exports = app;
