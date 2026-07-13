@@ -18,6 +18,6 @@ app.get('/health/db', async (req, res) =>{
     }
 })
 
-app.post('/auth', authRoutes);
+app.use('/auth', authRoutes);
 
 module.exports = app;
