@@ -16,7 +16,7 @@ router.post(
         if(!errors.isEmpty())
             return res.status(500).json({ errors: errors.array() });
 
-        const { email, password } = res.body;
+        const { email, password } = req.body;
 
         try{
             const [existing] = await db.query('SELECT id FROM users WHERE email = ?', [email]);
