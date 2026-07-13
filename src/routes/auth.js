@@ -1,6 +1,6 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
-const { body, validation } = require('express-validator');
+const { body, validationResult } = require('express-validator');
 const db = require('../config/db');
 
 const router = express.Router();
@@ -12,7 +12,7 @@ router.post(
         body('password').isLength({ min: 8 }).withMessage( 'Password must be at least 8 characters.' )
     ],
     async (req, res) => {
-        const errors = validation.errors(req);
+        const errors = validationResult(req);
         if(!errors.isEmpty())
             return res.status(500).json({ errors: errors.array() });
 
