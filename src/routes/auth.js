@@ -56,7 +56,7 @@ router.post(
         const { email, password } = req.body;
 
         try{
-            const [users] = db.query('SELECT * FROM user WHERE email = ?', [email]);
+            const [users] = db.query('SELECT * FROM users WHERE email = ?', [email]);
             if(users.length === 0)
                 return res.status(401).json({ message: 'Invalid email or passowrd '});
 
