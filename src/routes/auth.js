@@ -50,20 +50,18 @@ router.post(
     ],
     async (req, res) => {
         const errors = validationResult(req);
-        if(!errors.isEmpty());
+        if(!errors.isEmpty())
             res.status(500).json({ errors: errors.array() });
         
         const { email, password } = req.body;
 
         try{
-            const [users] = db.query('SELECT * FROM users WHERE email = ?', [email]);
+            const [users] = await db.query('SELECT * FROM users WHERE email = ?', [email]);
             if(users.length === 0)
                 return res.status(401).json({ message: 'Invalid email or passowrd '});
 
-            const hash_password = await bcrypt.hash(password, 12);
-
             const user = users[0];
-            const valid_password = bcrypt.compare(hash_password, user.password_hash);
+            const valid_password = bcrypt.compare(password, user.password_hash);
             if(!valid_password)
                 return res.status(401).json({ message: 'Invalid email or password' });
 
@@ -77,7 +75,7 @@ router.post(
             const refresh_token_hash = crypto.createHash('sha256').update(refresh_token).digest('hex');
 
             const expires_at = new Date();
-            expires_at.setDate(expires_at.getDate + 30);
+            expires_at.setDate(expires_at.getDate() + 30);
 
             await db.query(
                 'INSERT INTO sessions (id, user_id, token_hash, expires_at) VALUES (UUID(), ?, ?, ?)',
