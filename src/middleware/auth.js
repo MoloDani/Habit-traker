@@ -1,12 +1,12 @@
 const jwt = require('jsonwebtoken');
 
 function requireAuth(req, res, next){
-    const auth_header = req.headers.authorization;
+    const authHeader = req.headers.authorization;
 
-    if(!auth_header || !authHeader.startsWith('Bearer '))
+    if(!authHeader || !authHeader.startsWith('Bearer '))
         return res.status(401).json({ message: 'No token provided' });
     
-    const token = auth_header.split(' ')[1];
+    const token = authHeader.split(' ')[1];
 
     try{
         const payload = jwt.verify(token, process.env.JWT_SECRET);
