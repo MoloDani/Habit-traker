@@ -5,6 +5,7 @@ const db = require('../config/db');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const { ref } = require('process');
+const { error } = require('console');
 
 const router = express.Router();
 
@@ -92,6 +93,54 @@ router.post(
             return res.status(500).json({ message: 'Something went wrong' });
         }
     }
-)
+);
 
+router.post(
+    '/refresh',
+    async (req, res) =>{
+        const { refresh_token } = req.body;
+
+        if(!refresh_token)
+            return res.status(400).json({ error: 'Refresh token required' });
+
+        const token_hash = crypto.createHash('sha256').update(refresh_token).digest('hex');
+
+        try {
+            const [sessions] = await db.query(
+                'SELECT * FROM sessions WHERE token_hash = ? AND revoked_at IS NULL',
+                [token_hash]
+            );
+
+            if(sessions.length === 0)
+                return res.status(401).json({ error: 'Invalid refresh token' });
+
+            const session = sessions[0];
+
+            if(new Date(session.expires_at) < new Date())
+                return res.status(401).json({ error: 'Refresh token expired, please log in again' });
+
+            const new_expires_at = new Date();
+            new_expires_at.setDate(new_expires_at.getDate() + 30);
+
+            await db.query(
+                'UPDATE sessions SET expires_at = ? WHERE id = ?',
+                [new_expires_at, session.id]
+            );
+
+            const access_token = jwt.sign(
+                { userId: session.user_id },
+                process.env.JWT_SECRET,
+                { expiresIn: 900 }
+            );
+
+            return res.json({
+                access_token,
+                expiresIn: 900
+            });
+        } catch (err) {
+            console.log(err);
+            return res.status(500).json({ error: 'Something went wrong' });
+        }
+    }
+);
 module.exports = router;
