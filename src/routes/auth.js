@@ -143,4 +143,29 @@ router.post(
         }
     }
 );
+
+router.post(
+    '/logout',
+    async (res, req) => {
+        const { refresh_token } = req.body;
+
+        if(!refresh_token)
+            return res.status(400).json({ error: 'Refresh token required' });
+
+        const token_hash = crypto.createHash('sha256').update(refresh_token).digest('hex');
+
+        try {
+            await db.query(
+                'UPDATE sessions SET revoked_at = NOW() WHERE token_hash = ?',
+                [token_hash]
+            );
+
+            return res.json({ message: 'Logged out' });
+        } catch (err) {
+            console.log(err);
+            return res.status(500).json({ error: 'Something went wrong' });
+        }
+    }
+);
+
 module.exports = router;
