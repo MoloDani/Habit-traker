@@ -2,6 +2,7 @@ const express = require('express');
 const app = express();
 const db = require('./config/db')
 const authRoutes = require('./routes/auth');
+const requireAuth = require('./middleware/auth');
 
 app.use(express.json());
 
@@ -19,5 +20,9 @@ app.get('/health/db', async (req, res) =>{
 })
 
 app.use('/auth', authRoutes);
+
+app.get('/me', requireAuth, (req, res) => {
+    res.json({ userId: req.userId });
+})
 
 module.exports = app;
