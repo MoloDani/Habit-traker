@@ -100,7 +100,7 @@ router.post(
     }
 );
 
-router.get(
+router.delete(
     '/:id',
     requireAuth,
     async (req, res) => {
