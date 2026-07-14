@@ -22,7 +22,7 @@ app.get('/health/db', async (req, res) =>{
 
 app.use('/auth', authRoutes);
 
-app.use('/habit', habitRouts);
+app.use('/habits', habitRouts);
 
 app.get('/me', requireAuth, (req, res) => {
     res.json({ userId: req.userId });
