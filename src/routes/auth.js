@@ -146,7 +146,7 @@ router.post(
 
 router.post(
     '/logout',
-    async (res, req) => {
+    async (req, res) => {
         const { refresh_token } = req.body;
 
         if(!refresh_token)
