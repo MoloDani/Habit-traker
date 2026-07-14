@@ -2,6 +2,7 @@ const express = require('express');
 const app = express();
 const db = require('./config/db')
 const authRoutes = require('./routes/auth');
+const habitRouts = require('./routes/habits');
 const requireAuth = require('./middleware/auth');
 
 app.use(express.json());
@@ -20,6 +21,8 @@ app.get('/health/db', async (req, res) =>{
 })
 
 app.use('/auth', authRoutes);
+
+app.use('/habit', habitRouts);
 
 app.get('/me', requireAuth, (req, res) => {
     res.json({ userId: req.userId });
