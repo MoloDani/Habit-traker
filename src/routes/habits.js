@@ -45,6 +45,8 @@ router.get(
                 'SELECT * FROM habits WHERE user_id = ? AND state = "active" ORDER BY created_at DESC',
                 [req.userId]
             );
+
+            return res.json(habits);
         } catch (err) {
             console.log(err);
             return res.status(500).json({ error: 'Something went wrong' });
