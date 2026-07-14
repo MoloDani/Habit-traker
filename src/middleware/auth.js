@@ -4,7 +4,7 @@ function requireAuth(req, res, next){
     const auth_header = req.headers.authorization;
 
     if(!auth_header || !authHeader.startsWith('Bearer '))
-        return res.stauts(401).json({ message: 'No token provided' });
+        return res.status(401).json({ message: 'No token provided' });
     
     const token = auth_header.split(' ')[1];
 
