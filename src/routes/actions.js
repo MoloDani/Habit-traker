@@ -30,9 +30,11 @@ router.post(
             if(habits.length === 0)
                 return res.status(404).json({ error: 'Habit not found' });
 
+            const completedAtValue = completed_at ? new Date(completed_at) : new Date();
+
             await db.query(
-                'INSERT INTO actions (id, habit_id, completed_at, value) VALUES (UUID(), ?, ?, ?)',
-                [habitId, completed_at || new Date(), value]
+            'INSERT INTO actions (id, habit_id, completed_at, value) VALUES (UUID(), ?, ?, ?)',
+            [habitId, completedAtValue, value]
             );
 
             return res.json({ message: 'Action added' });
