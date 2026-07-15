@@ -35,7 +35,7 @@ router.post(
                 [habitId, completed_at || new Date(), value]
             );
 
-            return res.status
+            return res.json({ message: 'Action added' });
         } catch (err) {
             console.log(err);
             return res.status(500).json({ error: 'Something went wrong' });
