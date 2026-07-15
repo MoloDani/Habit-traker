@@ -32,7 +32,7 @@ router.post(
 
             await db.query(
                 'INSERT INTO actions (id, habit_id, completed_at, value) VALUES (UUID(), ?, ?, ?)',
-                [habitId, completed_at, value]
+                [habitId, completed_at || new Date(), value]
             );
 
             return res.status
