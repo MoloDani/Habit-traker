@@ -18,7 +18,7 @@ router.post(
         if(!errors.isEmpty())
             return res.status(400).json({ errors: errors.array() });
 
-        const { habitId } = req.body;
+        const { habitId } = req.params;
         const { completed_at, value } = req.body;
 
         try {
