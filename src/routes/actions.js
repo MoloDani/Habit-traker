@@ -1,5 +1,5 @@
 const express = require('express');
-const { body, validationResult } = require('express-validator');
+const { body, query, validationResult } = require('express-validator');
 const db = require('../config/db');
 const requireAuth = require('../middleware/auth');
 
@@ -29,10 +29,11 @@ router.post(
 
             if(habits.length === 0)
                 return res.status(404).json({ error: 'Habit not found' });
-            if(completed_at > new Date())
-                return res.status(404).json({ error: 'Can not update in the future' });
 
             const completedAtValue = completed_at ? new Date(completed_at) : new Date();
+            if(completed_at > new Date())
+                return res.status(400).json({ error: 'Can not update in the future' });
+
 
             await db.query(
             'INSERT INTO actions (id, habit_id, completed_at, value) VALUES (UUID(), ?, ?, ?)',
@@ -53,12 +54,6 @@ router.get(
     [ query('date').optional().isISO8601() ],
     async (req, res) => {
         const errors = validationResult(req);
-
-        if(!errors.isEmpty())
-            return res.status(500).json({ errors: errors.array() });
-
-        const { habitId } = req.params;
-        const { date } = req.query;
 
         if(!errors.isEmpty())
             return res.json(500).json({ errors: errors.array() });
