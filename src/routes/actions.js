@@ -29,6 +29,8 @@ router.post(
 
             if(habits.length === 0)
                 return res.status(404).json({ error: 'Habit not found' });
+            if(completed_at > new Date())
+                return res.status(404).json({ error: 'Can not update in the future' });
 
             const completedAtValue = completed_at ? new Date(completed_at) : new Date();
 
@@ -65,7 +67,7 @@ router.get(
                 [habitId]
             );
 
-            return res.json(actions);
+            return res.json({ actions: actions, cnt: actions.length});
         } catch (err) {
             console.log(err);
             return res.status(500).json({ error: 'Something went wrong' });
