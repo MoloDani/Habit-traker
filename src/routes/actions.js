@@ -77,19 +77,11 @@ router.get(
 
             if(date){
                 const [actions] = await db.query(
-<<<<<<< HEAD
                     'SELECT id, completed_at, value FROM actions WHERE habit_id = ? AND completed_at = ?',
                     [habitId, date]
                 );
 
                 return res.json(actions.length);
-=======
-                    'SELECT id, value FROM actions WHERE habit_id = ? AND (completed_at) = ?',
-                    [habitId, date]
-                );
-
-                return res.json(actions.length)
->>>>>>> 619cf1fd15618772000513f627dd80fc4a351792
             }
 
             const [actions] = await db.query(
