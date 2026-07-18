@@ -50,6 +50,7 @@ router.post(
 router.get(
     '/:habitId/actions',
     requireAuth,
+<<<<<<< HEAD
     [ query('date').optional().isISO8601() ],
     async (req, res) => {
         const errors = validationResult(req);
@@ -59,7 +60,20 @@ router.get(
 
         const { habitId } = req.params;
         const { date } = req.query;
+=======
+    [
+        query('date').optional().isISO8601()
+    ],
+    async (req, res) => {
+        const errors = validationResult(req);
+>>>>>>> 619cf1fd15618772000513f627dd80fc4a351792
 
+        if(!errors.isEmpty())
+            return res.json(500).json({ errors: errors.array() });
+
+        const { habitId } = req.params;
+        const { date } = req.body;
+            
         try {
             const [habits] = await db.query(
                 'SELECT id FROM habits WHERE id = ? AND user_id = ?',
@@ -71,15 +85,23 @@ router.get(
 
             if(date){
                 const [actions] = await db.query(
+<<<<<<< HEAD
                     'SELECT id, completed_at, value FROM actions WHERE habit_id = ? AND completed_at = ?',
                     [habitId, date]
                 );
 
                 return res.json(actions.length);
+=======
+                    'SELECT id, value FROM actions WHERE habit_id = ? AND (completed_at) = ?',
+                    [habitId, date]
+                );
+
+                return res.json(actions.length)
+>>>>>>> 619cf1fd15618772000513f627dd80fc4a351792
             }
 
             const [actions] = await db.query(
-                'SELECT id, completed_at, value FROM actions WHERE habit_id = ? ORDER BY completed_at DESC',
+                'SELECT id, value FROM actions WHERE habit_id = ?',
                 [habitId]
             );
 
