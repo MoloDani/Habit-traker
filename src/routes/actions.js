@@ -50,7 +50,6 @@ router.post(
 router.get(
     '/:habitId/actions',
     requireAuth,
-<<<<<<< HEAD
     [ query('date').optional().isISO8601() ],
     async (req, res) => {
         const errors = validationResult(req);
@@ -60,13 +59,6 @@ router.get(
 
         const { habitId } = req.params;
         const { date } = req.query;
-=======
-    [
-        query('date').optional().isISO8601()
-    ],
-    async (req, res) => {
-        const errors = validationResult(req);
->>>>>>> 619cf1fd15618772000513f627dd80fc4a351792
 
         if(!errors.isEmpty())
             return res.json(500).json({ errors: errors.array() });
