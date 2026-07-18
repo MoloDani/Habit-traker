@@ -80,7 +80,7 @@ router.get(
             }
 
             const [actions] = await db.query(
-                'SELECT id, value FROM actions WHERE habit_id = ?',
+                'SELECT id, completed_at, value FROM actions WHERE habit_id = ?',
                 [habitId]
             );
 
