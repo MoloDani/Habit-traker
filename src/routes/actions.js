@@ -51,51 +51,44 @@ router.get(
     '/:habitId/actions',
     requireAuth,
     [
-        body('date').optional().isISO8601()
+        query('date').optional().isISO8601()
     ],
     async (req, res) => {
+        const errors = validationResult(req);
+
+        if(!errors.isEmpty())
+            return res.json(500).json({ errors: errors.array() });
+
         const { habitId } = req.params;
         const { date } = req.body;
-        if(!date.isEmpty()){
-            try {
-                const [habits] = await db.query(
-                    'SELECT id FROM habits WHERE id = ? AND user_id = ?',
-                    [habitId, req.userId]
-                );
+            
+        try {
+            const [habits] = await db.query(
+                'SELECT id FROM habits WHERE id = ? AND user_id = ?',
+                [habitId, req.userId]
+            );
 
-                if(habits.length === 0)
-                    return res.status(404).json({ error: 'Habit not found' });
+            if(habits.length === 0)
+                return res.status(404).json({ error: 'Habit not found' });
 
+            if(date){
                 const [actions] = await db.query(
-                    'SELECT id, value FROM actions WHERE habit_id = ? AND completed_at = ?',
+                    'SELECT id, value FROM actions WHERE habit_id = ? AND (completed_at) = ?',
                     [habitId, date]
                 );
 
-                return res.json(actions.length);
-            } catch (err) {
-                console.log(err);
-                return res.status(500).json({ error: 'Something went wrong' });
+                return res.json(actions.length)
             }
-        }else{
-            try {
-                const [habits] = await db.query(
-                    'SELECT id FROM habits WHERE id = ? AND user_id = ?',
-                    [habitId, req.userId]
-                );
 
-                if(habits.length === 0)
-                    return res.status(404).json({ error: 'Habit not found' });
+            const [actions] = await db.query(
+                'SELECT id, value FROM actions WHERE habit_id = ?',
+                [habitId]
+            );
 
-                const [actions] = await db.query(
-                    'SELECT id, completed_at, value FROM actions WHERE habit_id = ? ORDER BY completed_at DESC',
-                    [habitId]
-                );
-
-                return res.json(actions);
-            } catch (err) {
-                console.log(err);
-                return res.status(500).json({ error: 'Something went wrong' });
-            }
+            return res.json(actions);
+        } catch (err) {
+            console.log(err);
+            return res.status(500).json({ error: 'Something went wrong' });
         }
     }
 );
