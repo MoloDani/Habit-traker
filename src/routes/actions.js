@@ -50,8 +50,15 @@ router.post(
 router.get(
     '/:habitId/actions',
     requireAuth,
+    [ query('date').optional().isISO8601() ],
     async (req, res) => {
+        const errors = validationResult(req);
+
+        if(!errors.isEmpty())
+            return res.status(500).json({ errors: errors.array() });
+
         const { habitId } = req.params;
+        const { date } = req.query;
 
         try {
             const [habits] = await db.query(
@@ -62,12 +69,21 @@ router.get(
             if(habits.length === 0)
                 return res.status(404).json({ error: 'Habit not found' });
 
+            if(date){
+                const [actions] = await db.query(
+                    'SELECT id, completed_at, value FROM actions WHERE habit_id = ? AND completed_at = ?',
+                    [habitId, date]
+                );
+
+                return res.json(actions.length);
+            }
+
             const [actions] = await db.query(
                 'SELECT id, completed_at, value FROM actions WHERE habit_id = ? ORDER BY completed_at DESC',
                 [habitId]
             );
 
-            return res.json({ actions: actions, cnt: actions.length});
+            return res.json(actions);
         } catch (err) {
             console.log(err);
             return res.status(500).json({ error: 'Something went wrong' });
