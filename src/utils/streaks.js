@@ -29,7 +29,7 @@ async function noOfCompletions(habit_id, date, type, max_completions){
     let auxD = new Date(date);
     let goodDays = 0;
 
-    while(auxD > lastD){
+    while(auxD >= lastD){
         if(await completionsPerDay(habit_id, auxD) === max_completions)
             goodDays++;
 
