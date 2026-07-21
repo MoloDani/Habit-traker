@@ -43,18 +43,19 @@ router.post(
             if(completed_at > new Date())
                 return res.status(400).json({ error: 'Can not update in the future' });
 
-            if(completionsPerDay(habitId, completedAtValue) >= habits[0].target)
+            if(completionsPerDay(habitId, completedAtValue) >= habits[0].target){
                 await db.query(
                     'DELETE FROM actions WHERE habit_id = ? AND completed_at = ?',
                     [habitId, completedAtValue]
                 );
-            else
+
+                return res.json({ message: 'Actions deleted because of too many' })
+            }else{
                 await db.query(
                     'INSERT INTO actions (id, habit_id, completed_at, value) VALUES (UUID(), ?, ?, ?)',
                     [habitId, completedAtValue, value]
                 );
-
-            return res.json({ message: 'Action added' });
+            }
         } catch (err) {
             console.log(err);
             return res.status(500).json({ error: 'Something went wrong' });
