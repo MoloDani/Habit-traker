@@ -11,7 +11,7 @@ async function completionsPerDay(habitId, date){
         [habitId, date]
     );
 
-    return res.json(actions.length);
+    return actions.length;
 }
 
 router.post(
