@@ -22,6 +22,7 @@ router.get(
             if(habits.length === 0)
                 return res.status(404).json({ error: 'Habit not found' });
 
+            console.log(habits[0].goal_type, habits[0].completions_per_day);
             const count = await noOfCompletions(habitId, new Date(), habits[0].goal_type, habits[0].completions_per_day);
             ans += count;
 
