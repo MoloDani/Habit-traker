@@ -26,7 +26,7 @@ function beginningOfType(date, type){
 
 async function noOfCompletions(habit_id, date, type, max_completions){
     const lastD = beginningOfType(date, type);
-    const auxD = new Date(date);
+    let auxD = new Date(date);
     let goodDays = 0;
 
     while(auxD > lastD){
