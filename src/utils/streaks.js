@@ -9,14 +9,14 @@ function beginningOfType(date, type){
     if(type === "weekly"){
         d.setDate(d.getDate() - d.getUTCDay());
         if(date === d)
-            d.setDate(beginningOfType(d.setDate(d.getDate() - 1)));
+            d.setDate(beginningOfType(d.setDate(d.getDate() - 1), type));
 
         return d;
     }
     if(type === "monthly"){
         d.setDate(d.getDate() - d.getUTCDate());
         if(date === d)
-            d.setDate(beginningOfType(d.setDate(d.getDate() - 1)));
+            d.setDate(beginningOfType(d.setDate(d.getDate() - 1), type));
 
         return d;
     }
@@ -27,7 +27,7 @@ function beginningOfType(date, type){
 async function noOfCompletions(habit_id, date, type, max_completions){
     const lastD = beginningOfType(date, type);
     const auxD = new Date(date);
-    const goodDays = 0;
+    let goodDays = 0;
 
     while(auxD > lastD){
         if(await completionsPerDay(habit_id, auxD) === max_completions)
