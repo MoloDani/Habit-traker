@@ -22,7 +22,7 @@ router.get(
             if(habits.length === 0)
                 return res.status(404).json({ error: 'Habit not found' });
 
-            ans = ans + noOfCompletions(habitId, new Date(), habits[0].goal_type, habits[0].completions_per_day);
+            ans = ans + await noOfCompletions(habitId, new Date(), habits[0].goal_type, habits[0].completions_per_day);
 
             return await res.status(201).json({ streak: ans });
         } catch (err) {
