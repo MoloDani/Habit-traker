@@ -43,7 +43,7 @@ router.post(
             if(completed_at > new Date())
                 return res.status(400).json({ error: 'Can not update in the future' });
 
-            if(completionsPerDay(habitId, completedAtValue) >= habits[0].target){
+            if(await completionsPerDay(habitId, completedAtValue) >= habits[0].target){
                 await db.query(
                     'DELETE FROM actions WHERE habit_id = ? AND completed_at = ?',
                     [habitId, completedAtValue]
