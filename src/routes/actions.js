@@ -5,7 +5,7 @@ const requireAuth = require('../middleware/auth');
 
 const router = express.Router();
 
-function completionsPerDay(habitId, date){
+async function completionsPerDay(habitId, date){
     const [actions] = await db.query(
         'SELECT id, completed_at, value FROM actions WHERE habit_id = ? AND completed_at = ?',
         [habitId, date]
