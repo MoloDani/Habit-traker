@@ -35,7 +35,7 @@ router.post(
 
         try {
             const [habits] = await db.query(
-                'SELECT id FROM habits WHERE id = ? AND user_id = ?',
+                'SELECT id, target FROM habits WHERE id = ? AND user_id = ?',
                 [habitId, req.userId]
             );
 
@@ -43,7 +43,7 @@ router.post(
                 return res.status(404).json({ error: 'Habit not found' });
 
             const completedAtValue = completed_at ? new Date(completed_at) : new Date();
-            if(completed_at > new Date())
+            if(completedAtValue > new Date())
                 return res.status(400).json({ error: 'Can not update in the future' });
 
             if(await completionsPerDay(habitId, completedAtValue) >= habits[0].target){
@@ -52,13 +52,16 @@ router.post(
                     [habitId, completedAtValue]
                 );
 
-                return res.json({ message: 'Actions deleted because of too many' })
-            }else{
-                await db.query(
-                    'INSERT INTO actions (id, habit_id, completed_at, value) VALUES (UUID(), ?, ?, ?)',
-                    [habitId, completedAtValue, value]
-                );
+                return res.json({ message: 'Actions deleted because of too many' });
             }
+
+            await db.query(
+                'INSERT INTO actions (id, habit_id, completed_at, value) VALUES (UUID(), ?, ?, ?)',
+                [habitId, completedAtValue, value]
+            );
+
+            return res.json({ message: 'Action added' });
+            
         } catch (err) {
             console.log(err);
             return res.status(500).json({ error: 'Something went wrong' });
@@ -73,10 +76,9 @@ router.get(
         const errors = validationResult(req);
 
         if(!errors.isEmpty())
-            return res.json(500).json({ errors: errors.array() });
+            return res.status(500).json({ errors: errors.array() });
 
         const { habitId } = req.params;
-        const { date } = req.body;
             
         try {
             const [habits] = await db.query(
