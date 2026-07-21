@@ -4,6 +4,7 @@ const db = require('./config/db')
 const authRoutes = require('./routes/auth');
 const habitRouts = require('./routes/habits');
 const actionRouts = require('./routes/actions');
+const streakRouts = require('./routes/streak');
 const requireAuth = require('./middleware/auth');
 
 app.use(express.json());
@@ -26,6 +27,8 @@ app.use('/auth', authRoutes);
 app.use('/habits', habitRouts);
 
 app.use('/habits', actionRouts);
+
+app.use('/habits', streakRouts);
 
 app.get('/me', requireAuth, (req, res) => {
     res.json({ userId: req.userId });
