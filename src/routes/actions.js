@@ -2,20 +2,9 @@ const express = require('express');
 const { body, query, validationResult } = require('express-validator');
 const db = require('../config/db');
 const requireAuth = require('../middleware/auth');
+const completionsPerDay = require('../utils/completions');
 
 const router = express.Router();
-
-async function completionsPerDay(habitId, date){
-    const startOfDay = new Date(date); startOfDay.setHours(0,0,0,0);
-    const endOfDay = new Date(date); endOfDay.setHours(23,59,59,999);
-
-    const [actions] = await db.query(
-        'SELECT id FROM actions WHERE habit_id = ? AND completed_at BETWEEN ? AND ?',
-        [habitId, startOfDay, endOfDay]
-    );
-
-    return actions.length;
-}
 
 router.post(
     '/:habitId/actions',
@@ -35,7 +24,7 @@ router.post(
 
         try {
             const [habits] = await db.query(
-                'SELECT id, target FROM habits WHERE id = ? AND user_id = ?',
+                'SELECT id, completions_per_day FROM habits WHERE id = ? AND user_id = ?',
                 [habitId, req.userId]
             );
 
@@ -46,7 +35,7 @@ router.post(
             if(completedAtValue >= new Date() + 1)
                 return res.status(400).json({ error: 'Can not update in the future' });
 
-            if(await completionsPerDay(habitId, completedAtValue) >= habits[0].target){
+            if(await completionsPerDay(habitId, completedAtValue) >= habits[0].completions_per_day){
                 await db.query(
                     'DELETE FROM actions WHERE habit_id = ? AND completed_at = ?',
                     [habitId, completedAtValue]
