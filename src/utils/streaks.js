@@ -24,13 +24,13 @@ function beginningOfType(date, type){
     return new Error("Invalid goal type");
 }
 
-function noOfCompletions(habit_id, date, type, max_completions){
+async function noOfCompletions(habit_id, date, type, max_completions){
     const lastD = beginningOfType(date, type);
     const auxD = new Date(date);
     const goodDays = 0;
 
     while(auxD > lastD){
-        if(completionsPerDay(habit_id, auxD) === max_completions)
+        if(await completionsPerDay(habit_id, auxD) === max_completions)
             goodDays++;
 
         auxD.setDate(auxD.getDate() - 1);
