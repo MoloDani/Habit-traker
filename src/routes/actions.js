@@ -6,9 +6,12 @@ const requireAuth = require('../middleware/auth');
 const router = express.Router();
 
 async function completionsPerDay(habitId, date){
+    const startOfDay = new Date(date); startOfDay.setHours(0,0,0,0);
+    const endOfDay = new Date(date); endOfDay.setHours(23,59,59,999);
+
     const [actions] = await db.query(
-        'SELECT id, completed_at, value FROM actions WHERE habit_id = ? AND completed_at = ?',
-        [habitId, date]
+        'SELECT id FROM actions WHERE habit_id = ? AND completed_at BETWEEN ? AND ?',
+        [habitId, startOfDay, endOfDay]
     );
 
     return actions.length;
