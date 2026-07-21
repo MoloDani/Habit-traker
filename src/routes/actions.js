@@ -5,6 +5,15 @@ const requireAuth = require('../middleware/auth');
 
 const router = express.Router();
 
+function completionsPerDay(habitId, date){
+    const [actions] = await db.query(
+        'SELECT id, completed_at, value FROM actions WHERE habit_id = ? AND completed_at = ?',
+        [habitId, date]
+    );
+
+    return res.json(actions.length);
+}
+
 router.post(
     '/:habitId/actions',
     requireAuth,
@@ -25,7 +34,7 @@ router.post(
             const [habits] = await db.query(
                 'SELECT id FROM habits WHERE id = ? AND user_id = ?',
                 [habitId, req.userId]
-            )
+            );
 
             if(habits.length === 0)
                 return res.status(404).json({ error: 'Habit not found' });
@@ -34,11 +43,16 @@ router.post(
             if(completed_at > new Date())
                 return res.status(400).json({ error: 'Can not update in the future' });
 
-
-            await db.query(
-            'INSERT INTO actions (id, habit_id, completed_at, value) VALUES (UUID(), ?, ?, ?)',
-            [habitId, completedAtValue, value]
-            );
+            if(completionsPerDay(habitId, completedAtValue) >= habits[0].target)
+                await db.query(
+                    'DELETE FROM actions WHERE habit_id = ? AND completed_at = ?',
+                    [habitId, completedAtValue]
+                );
+            else
+                await db.query(
+                    'INSERT INTO actions (id, habit_id, completed_at, value) VALUES (UUID(), ?, ?, ?)',
+                    [habitId, completedAtValue, value]
+                );
 
             return res.json({ message: 'Action added' });
         } catch (err) {
@@ -51,7 +65,6 @@ router.post(
 router.get(
     '/:habitId/actions',
     requireAuth,
-    [ query('date').optional().isISO8601() ],
     async (req, res) => {
         const errors = validationResult(req);
 
@@ -69,15 +82,6 @@ router.get(
 
             if(habits.length === 0)
                 return res.status(404).json({ error: 'Habit not found' });
-
-            if(date){
-                const [actions] = await db.query(
-                    'SELECT id, completed_at, value FROM actions WHERE habit_id = ? AND completed_at = ?',
-                    [habitId, date]
-                );
-
-                return res.json(actions.length);
-            }
 
             const [actions] = await db.query(
                 'SELECT id, completed_at, value FROM actions WHERE habit_id = ?',
