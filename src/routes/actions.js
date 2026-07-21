@@ -43,7 +43,7 @@ router.post(
                 return res.status(404).json({ error: 'Habit not found' });
 
             const completedAtValue = completed_at ? new Date(completed_at) : new Date();
-            if(completedAtValue > new Date())
+            if(completedAtValue >= new Date() + 1)
                 return res.status(400).json({ error: 'Can not update in the future' });
 
             if(await completionsPerDay(habitId, completedAtValue) >= habits[0].target){
