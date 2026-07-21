@@ -21,7 +21,7 @@ router.get(
             if(habits.length === 0)
                 return res.status(404).json({ error: 'Habit not found' });
 
-            return await noOfCompletions(habitId, new Date(), habits[0].goal_type, habits[0].completions_per_day);
+            return await res.status(201).json(noOfCompletions(habitId, new Date(), habits[0].goal_type, habits[0].completions_per_day));
         } catch (err) {
             console.log(err);
             return res.status(500).json({ error: 'Something went wrong' });
