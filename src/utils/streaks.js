@@ -7,9 +7,10 @@ function beginningOfType(date, type){
         return d;
     }
     if(type === "weekly"){
-        d.setDate(d.getDate() - d.getUTCDay());
-        if(date === d)
-            d.setDate(beginningOfType(d.setDate(d.getDate() - 1), type));
+        if(d.getUTCDay() != 0)
+            d.setDate(d.getDate() - d.getUTCDay());
+        else
+            d.setDate(d.getDate() - 7);
 
         return d;
     }
@@ -28,8 +29,6 @@ async function noOfCompletions(habit_id, date, type, max_completions){
     const lastD = beginningOfType(date, type);
     let auxD = new Date(date);
     let goodDays = 0;
-
-    console.log(auxD, " - ", lastD);
 
     while(auxD > lastD){
         if(await completionsPerDay(habit_id, auxD) === max_completions){
