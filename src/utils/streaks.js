@@ -33,7 +33,6 @@ async function noOfCompletions(habit_id, date, type, max_completions){
     while(auxD > lastD){
         if(await completionsPerDay(habit_id, auxD) === max_completions){
             goodDays++;
-            console.log(auxD);
         }
 
         auxD.setDate(auxD.getDate() - 1);
