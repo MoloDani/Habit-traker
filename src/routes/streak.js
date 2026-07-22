@@ -30,7 +30,7 @@ router.get(
             do{
                 ans += count;
                 count = await noOfCompletions(habitId, d, habits[0].goal_type, habits[0].completions_per_day);
-                console.log(count);
+                console.log(count, d);
                 d = beginningOfType(d, habits[0].goal_type);
             }while(count >= habits[0].target);
 
