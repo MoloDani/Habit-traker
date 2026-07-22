@@ -40,4 +40,4 @@ async function noOfCompletions(habit_id, date, type, max_completions){
 }
 
 
-module.exports = noOfCompletions;
+module.exports = { beginningOfType, noOfCompletions };
